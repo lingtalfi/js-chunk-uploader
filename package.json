@@ -1,0 +1,13 @@
+{
+  "name": "chunk-uploader",
+  "version": "1.0.0",
+  "description": "A js tool to help implementing a chunk uploading system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "lingtalfi",
+  "homepage": "https://github.com/lingtalfi/js-chunk-uploader",
+  "license": "ISC"
+}
