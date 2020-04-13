@@ -1,6 +1,6 @@
 {
   "name": "chunk-uploader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A js tool to help implementing a chunk uploading system.",
   "main": "index.js",
   "scripts": {

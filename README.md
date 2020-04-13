@@ -1,10 +1,12 @@
 js chunk uploader
 =============
-2020-04-08
+2020-04-08 -> 2020-04-13
 
 
 A js tool to help implementing a chunk uploading system.
 
+
+This can be used as the js client in a [simple-chunk-upload-protocol](https://github.com/lingtalfi/TheBar/blob/master/discussions/simple-chunk-upload-protocol.md) communication.
 
 
 Install
@@ -56,6 +58,10 @@ async function demo(file){
 History log
 =============
 
+- 1.0.1 -- 2020-04-13 
+    
+    - add link in README.md
+    
 - 1.0.0 -- 2020-04-08 
     
     - initial commit
