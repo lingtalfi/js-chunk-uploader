@@ -1,10 +1,14 @@
 {
   "name": "chunk-uploader",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A js tool to help implementing a chunk uploading system.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "dependencies": {
+    "jsx-extension-ling": "^1.24.0"
   },
   "keywords": [],
   "author": "lingtalfi",

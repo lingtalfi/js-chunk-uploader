@@ -1,6 +1,6 @@
 js chunk uploader
 =============
-2020-04-08 -> 2020-04-13
+2020-04-08 -> 2020-04-20
 
 
 A js tool to help implementing a chunk uploading system.
@@ -58,6 +58,10 @@ async function demo(file){
 History log
 =============
 
+- 1.1.0 -- 2020-04-20 
+    
+    - Update sendByChunks, now handles data parameter recursively
+    
 - 1.0.1 -- 2020-04-13 
     
     - add link in README.md

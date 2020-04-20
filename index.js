@@ -1,3 +1,5 @@
+const jsx = require("js-extension-ling");
+
 class ChunkUploader {
 
     constructor(options) {
@@ -106,9 +108,8 @@ class ChunkUploader {
         formdata.append('end', end);
         formdata.append('file', piece);
         formdata.append('last_chunk', (isLastChunk ? 1 : 0));
-        for (let i in userData) {
-            formdata.append(i, userData[i]);
-        }
+
+        formdata = jsx.toFormData(userData, formdata);
 
 
         return this._sendViaFetch(resolve, reject, formdata, start, end, size, isLastChunk);
