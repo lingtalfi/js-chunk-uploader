@@ -22,10 +22,30 @@ class ChunkUploader {
         this.onChunkAborted = options.onChunkAborted || function (start, end, isLastChunk) {
             console.log(`The chunk has been aborted: ${start}-${end}, isLastChunk=${isLastChunk}.`);
         };
+        /**
+         * Sets a callback to control whether the received chunk is ok.
+         * Use this callback to interrupt the upload process at any chunk.
+         *
+         *
+         * The callback receives a clone of the response.
+         * (a clone is used so that the callback can analyze the response without consuming the real response
+         * body, which is eventually returned by the sendByChunks method.
+         *
+         * If the callback returns something else than true, the promise will be rejected.
+         * If the callback returns false, a default error message will be generated.
+         * If the callback returns a string, this string will be used as the error message.
+         *
+         * Note: this should be an async function.
+         *
+         */
+        this.onChunkResponseReceived = options.onChunkResponseReceived || async function (response) {
+            return true;
+        };
 
         this._xhr = null;
         this.controller = new AbortController();
         this._is_aborted = false;
+        this._chunkFailed = false;
 
     }
 
@@ -66,6 +86,8 @@ class ChunkUploader {
         var start = options.start || 0;
 
         this._is_aborted = false;
+        this._chunkFailed = false;
+        let $this = this;
         return new Promise((resolve, reject) => {
 
 
@@ -85,12 +107,14 @@ class ChunkUploader {
 
                 var s = $this._slice(file, start, end);
 
-                await $this._send(resolve, reject, s, start, end, size, isLastChunk, data);
+                if (false === $this._chunkFailed) {
+                    await $this._send(resolve, reject, s, start, end, size, isLastChunk, data);
 
 
-                if (end < size) {
-                    start += $this.sliceSize;
-                    setTimeout(loop, $this.timer);
+                    if (end < size) {
+                        start += $this.sliceSize;
+                        setTimeout(loop, $this.timer);
+                    }
                 }
             }
         });
@@ -150,7 +174,6 @@ class ChunkUploader {
                     this.onChunkAborted(start, end, isLastChunk);
                 } else {
                     _reject(errMsg);
-                    reject(errMsg);
                 }
             });
 
@@ -159,18 +182,30 @@ class ChunkUploader {
                 this.onChunkAborted(start, end, isLastChunk);
             } else {
                 if (true === response.ok) {
-                    this.onChunkLoaded(start, end, size, isLastChunk);
 
-                    _resolve();
 
-                    if (true === isLastChunk) {
-                        resolve(response);
+                    let ret = await this.onChunkResponseReceived(response.clone());
+
+                    if (true === ret) {
+                        this.onChunkLoaded(start, end, size, isLastChunk);
+                        _resolve();
+
+                        if (true === isLastChunk) {
+                            resolve(response);
+                        }
+                    } else {
+                        if ('string' === typeof ret) {
+                            errMsg = ret;
+                        }
+                        _reject(errMsg);
                     }
                 } else {
                     _reject(errMsg);
-                    reject(errMsg);
                 }
             }
+        }).catch((e) => {
+            reject(e);
+            this._chunkFailed = true;
         });
 
     }

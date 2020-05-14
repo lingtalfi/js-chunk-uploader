@@ -1,6 +1,6 @@
 js chunk uploader
 =============
-2020-04-08 -> 2020-04-20
+2020-04-08 -> 2020-05-14
 
 
 A js tool to help implementing a chunk uploading system.
@@ -20,7 +20,8 @@ npm i chunk-uploader
 Usage
 ======
 
-
+Example 1: the basics
+---------
 
 ```js
 const ChunkUploader = require("chunk-uploader");
@@ -55,9 +56,65 @@ async function demo(file){
 ```
 
 
+Example 2: handling failure at the chunk level
+---------
+In this example we use the **onChunkResponseReceived** callback to test every chunk's response.
+If a chunk's response fails, the upload of the file stops immediately.
+
+This allows us to fail early, rather than having to wait until the end of the upload before triggering an error message.
+
+
+```js 
+const ChunkUploader = require("chunk-uploader");
+
+async function example(){
+
+    let chunkUploader = new ChunkUploader({
+        serverUrl: options.serverUrl,
+        // chunkSize: 5 * 1024 * 1024,
+        onChunkAborted: (start, end, isLastChunk) => {
+            console.log("the upload has been aborted...");
+        },
+        onChunkLoaded: (start, end, size, isLastChunk) => {
+            let percent = Math.round(end / size * 100, 2) + "%";
+            // update your gui...
+        },
+        onChunkResponseReceived: async function (response) {
+            try {
+                let jsonResponse = await response.json();
+                // analyze the chunk response here, and return true if ok...
+                return true;
+            } catch (e) {
+                // otherwise return a message error, this will interrupt the upload.
+                // or return false to use a default error message
+                return e.toString();
+            }
+        }
+    });
+            
+    let file = 0 // replace with some js File object
+    let data = {}; // extra data if necessary, this is sent via post
+    let response = await chunkUploader.sendByChunks(file, data);
+    let jsonResponse = await response.json();
+
+}
+
+example();
+
+
+
+```
+
+
+
+
 History log
 =============
 
+- 1.2.0 -- 2020-05-14 
+    
+    - add onChunkResponseReceived callback option
+    
 - 1.1.0 -- 2020-04-20 
     
     - Update sendByChunks, now handles data parameter recursively
